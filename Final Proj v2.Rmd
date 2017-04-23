@@ -1,0 +1,189 @@
+---
+title: "Final proj v2"
+author: "anurag"
+date: "March 15, 2017"
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+---
+Final Project in R
+
+
+Introduction:
+
+I have choosen the "Birth Weight" data set in the MASS package to analyze. The reason I choose this data was because of the factors considered in the weight of a child. These are interesting insights on factors affecting the weight of a child.
+
+One line of this data set represents the various factors which are recorded for a new born child. This data is collected for Baystate Medical Center, Springfield, Mass during 1986.
+
+
+Makeup of Data:
+
+The factors considered are as follows: 
+Indicator of baby weight less than 2.5kg, Age of of mother in years, Mothers weight in pounds at the last menstruation period, race, smoking or non smoking, Previous premature labours, hypertension, Uterine irritability, number of physician visits during the first trimester and lastly the weight of a newborn baby.
+
+In short, some important health aspects of the mother alongwith the weight of a newborn baby are recorded in one row.
+
+
+Research question:
+
+What effect does age, race, mothers weight, previous labours and number of physician visits have on the weight of a new born child.
+
+This is an interesting relationship since the generalized baby weight is 2.5 kgs or 8 pounds. I wanted to see how any of the above factors affects the weight of baby.
+
+
+Method of progression:
+
+For each predictor, I have fit a simple linear regression model to predict the response. This is to see the statistical significance of the factors which are present in my research question. Then I have calculated a linear equation for each and procedded to plot the graph for the response.
+
+After the univariate analysis, I have then calculated a multivariate regression analysis to find the find the p-value and how the values overall affect the baby weights. After this analysis, I have then provided my conclusions below.
+
+
+Analysis:
+
+For each factor in my research question, I have formulated an equation, followed by a plot for the baby weight vs the factor in consideration.
+
+
+Load Mass package and Birth Weight (birthwt) tables.
+
+```{r}
+library(MASS)
+?birthwt
+data("birthwt")
+View(birthwt)
+library(ggplot2)
+```
+
+Create a data table for birth weights and view the first few rows of the data.
+```{r}
+library(data.table)
+head(birthwt)
+birthwt <- data.table(birthwt)
+View(birthwt)
+```
+
+
+Age
+
+```{r}
+lr_age = lm(bwt~age, data=birthwt)
+lr_age
+
+plot1 <- ggplot(birthwt, aes(y = bwt, x = age)) + geom_point() +
+geom_smooth(method = lm) +
+labs(x = "Mothers Age", y = "Baby weight (grams)",
+title = "Mothers Age vs Baby weight")
+plot1
+```
+
+As seen above, 
+Birth weight of baby = 2655.74 + 12.43*(Age of mother)
+For a 1 year increase in age of the mother, baby weight increases by 12.43 grams.
+
+
+Race
+
+```{r}
+lr_race = lm(bwt~race, data=birthwt)
+lr_race
+
+plot5 <- ggplot(birthwt, aes(y = bwt, x = race)) + geom_point() +
+geom_smooth(method = lm) +
+labs(x = "Mothers racial background", y = "Baby weight (grams)",
+title = "Race vs Baby weight")
+plot5
+```
+
+Birth weight of baby = 3230.1 - 154.6*(Race of Mother)
+There is a 154.6 gram decrease from women of white racial background to black to other.
+
+
+Mother's weight in pounds
+
+Converting to grams
+```{r}
+birthwt$gram_lwt = (birthwt$lwt*454)
+View(birthwt)
+```
+
+
+```{r}
+lr_lwt = lm(bwt~gram_lwt, data=birthwt)
+lr_lwt
+
+plot2 <- ggplot(birthwt, aes(y = bwt, x = gram_lwt)) + geom_point() +
+geom_smooth(method = lm) +
+labs(x = "Mothers weight", y = "Baby weight (grams)",
+title = "Mothers weight vs Baby weight")
+plot2
+```
+
+Since mothers weight was expressed in pounds and baby weight in grams, I have calculated a field for converting it to grams so that we can directly compare it to the baby weight.
+Birth weight of baby = 2.370e+03 + 9.756e-03*(Mothers weight at last menstruation)
+for 1 pound increase in mothers weight, baby weight increases by 9.756e-03 grams.
+
+Previous Premature Labours
+
+```{r}
+lr_ptl = lm(bwt~ptl, data=birthwt)
+lr_ptl
+
+plot3 <- ggplot(birthwt, aes(y = bwt, x = ptl)) + geom_point() +
+geom_smooth(method = lm) +
+labs(x = "prev premature lab", y = "Baby weight (grams)",
+title = "Previous labours vs Baby weight")
+plot3
+```
+
+Birth weight of baby = 2989.3 - 228.6*(Previous premature labours)
+For each incraease premature labours, baby weight reduces by 228 grams
+
+Physician Visits:
+
+```{r}
+lr_ftv = lm(bwt~ftv, data=birthwt)
+lr_ftv
+
+plot4 <- ggplot(birthwt, aes(y = bwt, x = ftv)) + geom_point() +
+geom_smooth(method = lm) +
+labs(x = "physician visit", y = "Birth weight in gm",
+title = "physician visit vs Baby weight")
+plot4
+```
+
+Birth weight of baby = 2912.73 + 40.15*(Number of physician visits)
+For each visit to physician, baby weight increases 4.4 grams.
+
+
+
+
+Multivariate Regression:
+
+```{r}
+model_summ = lm(bwt ~ low + age + gram_lwt + race + smoke + ptl + ht + ui + ftv, data = birthwt)
+summary(model_summ)
+
+ggplot(birthwt, aes(x=bwt)) + 
+  geom_point(aes(color=race, y=ui), alpha=0.5) + 
+  geom_line(aes(color=race, y=gram_lwt)) +
+  labs(title="Regression for baby weights",
+       x="Baby weight (grams)",
+       y="Infections & Mothers Weight")
+```
+
+
+
+As seen from the co-efficients of P-values, the most statistically signaficant values affecting Weight of a new born baby are the low weights of babies, presence of uterine irritability followed decreasingly by race and smoking. 
+
+From the regression, age, previous labours, hypertension and visits to the doctor do not affect the weight of babies. 
+
+The Low weight of a baby is directly co-realted with the weight of a baby and hence is by default a part of the analysis.
+
+Uterine irritability is supposedly the main factor affecting weights of babies followed by race and smoking.
+
+My reserch question was based on age, race, previous labours and visits to the physician. From the regression, it is clear that of these, race is the one which is a signifant effector, while the others are not.
+
+One of the major drawbacks here would be that only co-relation may be proven, not causality. This is true for most regressions. It is upto the analyst on what basis to relate the factors.
+
+
+
