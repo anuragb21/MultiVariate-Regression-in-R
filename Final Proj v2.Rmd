@@ -1,5 +1,5 @@
 ---
-title: "Final proj v2"
+title: "R - Birth Weight Factors"
 author: "anurag"
 date: "March 15, 2017"
 output:
@@ -7,7 +7,7 @@ output:
   pdf_document: default
   html_document: default
 ---
-Final Project in R
+R Project
 
 
 Introduction:
